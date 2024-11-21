@@ -21,5 +21,8 @@ Nesta fase, o jogador precisa atravessar um deserto cheio de obstáculos básico
 ## Fase Grupo G
 
 A fase começa com uma pergunta para definir caçadores e presas. As presas tentam escapar em um campo minado, com penalidades e chances de redenção. Caçadores têm tempo limitado para capturar as presas, que ganham pontos se sobreviverem até o fim.
-...
+
+## Fase Grupo H
+
+A fase começa com tres numeros entre 2 a 4, onde voce deve escolher apenas um deles. Ao seguir caminho inimigos virão atacar, e você pode atacar somente os inimigos multiplos do numero que escolheu, e os inimigos com os inimigos com números que não são multiplos não lhe causarão dano ao chegar perto, porém se atacar o inimigo com o número errado dano será tomado, e isso se repetirá até o fim da fase.
 
