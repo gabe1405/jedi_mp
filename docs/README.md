@@ -7,6 +7,7 @@ Nesta seção cada grupo deve editar este arquivo, criando uma subseção onde d
 Descrição da fase do **Grupo A**. 
 
 ## Fase Grupo B
+Uma fase offline onde dada uma questão, o jogador poderá escolher a alternativa se posicionando dentro de um dos quatro quadrantes do mapa1 para selecionar sua resposta, caso a reposta esteja correta o jogador recebe buffs para lutar com os mobs no mapa2.
 
 Descrição da fase do **Grupo A**. 
 
