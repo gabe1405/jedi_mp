@@ -1,148 +1,96 @@
-<!doctype html> 
-    <!-- HTML Padrão -->
-<html lang="en"> 
-<head> 
+<!doctype html>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
-    <title>Intro Phaser 3.</title>
+    <title>Phaser 3 Map Example</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.87.0/phaser.min.js"></script>
-
-    <style type="text/css">
+    <style>
         body {
             margin: 0;
         }
     </style>
 </head>
 <body>
+<script>
+// Classe principal do jogo
+class GravityArrow extends Phaser.Scene {
 
-    <!-- código javascript -->
-<script type="text/javascript">
+    // Carregar os assets
+    preload() {
+        console.log('Carregando assets...');
 
-class gravity_arrow extends Phaser.Scene {
+        // Carregar o tileset (imagem usada pelo mapa)
+        this.load.image('tiles', './Mapa.png');
 
-    // função para carregamento de assets
-    preload ()
-    {
-        console.log('load assets');
-        this.load.spritesheet('player_sp', '../assets/spritesheets/a-king.png', { frameWidth: 78, frameHeight: 58 });
-
-        this.load.image('tiles', '../assets/maps/dungeon-16-16.png');
-
-        this.load.tilemapTiledJSON('themap', '../assets/maps/Grupo E/Mapa.png');
-
-        this.load.atlas('flares', '../assets/spritesheets/flares.png', '../assets/spritesheets/flares.json');
-
+        // Carregar o mapa (JSON exportado pelo Tiled)
+        this.load.tilemapTiledJSON('map', './mapa.json');
     }
 
-    // função para criação dos elementos
-    create ()
-    {
+    // Criar a cena
+    create() {
+        console.log('Criando cena...');
 
-        // criação do mapa e ligação com a imagem (tilesheet)
-        this.map = this.make.tilemap({ key: 'themap', tileWidth: 16, tileHeight: 16 });
-        this.tileset = this.map.addTilesetImage('intro_tileSet', 'tiles');
+        // Criar o mapa com base no JSON carregado
+        const map = this.make.tilemap({ key: 'map' });
 
-        // criação das camadas
-        this.groundLayer = this.map.createLayer('ground', this.tileset, 0, 0);
-        this.wallsLayer = this.map.createLayer('walls', this.tileset, 0, 0);
+        // Associar o tileset ao mapa
+        const tileset = map.addTilesetImage('mapa', './Mapa.png'); // Substitua 'Mapa' pelo nome do tileset no Tiled
 
-        // criação do jogador
-        this.player = this.physics.add.sprite(100, 300, 'player_sp', 5);
-
-        // criação do campo minado
-        this.mines = this.physics.add.group();
-        this.mines.create(50, 100, 'player_sp').setVisible(false);
-        this.mines.create(50, 400, 'player_sp').setVisible(false);
-        this.mines.create(400, 100, 'player_sp').setVisible(false);
-        this.mines.create(500, 300, 'player_sp').setVisible(false);
-
-        // criação da colisão
-        this.wallsLayer.setCollisionBetween(30, 40, true)
-        this.physics.add.collider(this.player, this.wallsLayer);
-        this.physics.add.overlap(this.player, this.mines, hitMine, null, this);
-
-        this.emitter = this.add.particles(100, 100, 'flares', {
-            //frame: [ 'red', 'yellow', 'green' ],
-            frame: [ 'yellow' ],
-            lifespan: 4000,
-            speed: { min: 150, max: 250 },
-            scale: { start: 0.8, end: 0 },
-            blendMode: 'ADD',
-            emitting: false
-        });
+        const groundLayer = map.createLayer('ground', tileset, 0, 0); // Nome da camada no Tiled
+        const wallsLayer = map.createLayer('walls', tileset, 0, 0);   // Nome da camada no Tiled
 
 
-        // ligação das teclas de movimento
-        this.keyA = this.input.keyboard.addKey('A');
-        this.keyD = this.input.keyboard.addKey('D');
-        this.keyW = this.input.keyboard.addKey('W');
-        this.keyS = this.input.keyboard.addKey('S');
-        this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.space_pressed = false;
+        // Configurar colisões na camada de paredes (walls)
+        wallsLayer.setCollisionByProperty({ collides: true });
+
+        // Adicionar um jogador ao mapa
+        this.player = this.physics.add.sprite(100, 100, null);
+        this.player.setCollideWorldBounds(true);
+
+        // Adicionar física às paredes
+        this.physics.add.collider(this.player, wallsLayer);
+
+        // Configurar controles
+        this.cursors = this.input.keyboard.createCursorKeys();
     }
 
-
-    // update é chamada a cada novo quadro
-    update ()
-    {
-
-        // velocidade horizontal
-        if (this.keyD?.isDown) 
-            this.player.setVelocityX(250);
-        else if (this.keyA?.isDown) 
-            this.player.setVelocityX(-250);
-        else{
-            this.player.setVelocityX(0); 
+    // Atualizar a cena a cada frame
+    update() {
+        // Movimentar o jogador
+        if (this.cursors.left.isDown) {
+            this.player.setVelocityX(-200);
+        } else if (this.cursors.right.isDown) {
+            this.player.setVelocityX(200);
+        } else {
+            this.player.setVelocityX(0);
         }
 
-        // velocidade vertical
-        if (this.keyS?.isDown) 
-            this.player.setVelocityY(250);
-        else if (this.keyW?.isDown) 
-            this.player.setVelocityY(-250);
-        else{
+        if (this.cursors.up.isDown) {
+            this.player.setVelocityY(-200);
+        } else if (this.cursors.down.isDown) {
+            this.player.setVelocityY(200);
+        } else {
             this.player.setVelocityY(0);
         }
     }
 }
 
-function hitMine(player, zone){
-    this.emitter.x = this.player.x;
-    this.emitter.y = this.player.y;
-    this.emitter.explode(16);
-    this.physics.world.disable(zone);
-    console.log('.')
-}
-
-
 // Configuração do jogo
-var config = {
+const config = {
     type: Phaser.AUTO,
-
-    // resolução e sistema de colisão.
     width: 800,
     height: 600,
     physics: {
-            default: 'arcade',
-            arcade: {
-                debug: true,
-            },
+        default: 'arcade',
+        arcade: {
+            debug: true,
+        },
     },
-
-    // tratamento dos gráficos: pixelado
-    render: {
-        antialiasGL: false,
-        pixelArt: true,
-    },
-
-    // funções da classe scene:
-    scene: [gravity_arrow],
+    scene: GravityArrow,
 };
 
-
-
-var game = new Phaser.Game(config);
-
+// Inicializar o jogo
+const game = new Phaser.Game(config);
 </script>
-
 </body>
 </html>
