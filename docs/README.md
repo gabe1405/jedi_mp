@@ -15,6 +15,10 @@ Descrição da fase do **Grupo A**.
 
 Uma fase em formato de plataforma competitiva para ser jogada multiplayer localmente, as questões serão inseridas no começo da fase, onde caso o jogador acerte a questão ele recebe privilégios como armas com maior alcance e/ou maior quantidade de vidas. Os tiros serão a longa distância e estarão sujeitos a gravidade. 
 
+## Fase Grupo D
+
+Pig-Man é um jogo no estilo Pac-Man,com um toque educativo O jogador controla um personagem principal, "PigMen", que navega por labirintos cheios de desafios, obstáculos e inimigos.Ele precisa coletar buffs que facilitam sua jornada e deve responder corretamente a uma pergunta relacionada a um tema de aprendizado.(basicamente o efeito do buff só ativa se ele acertar a perguntar).
+
 ## Fase Grupo E 
 
 Nesta fase, o jogador precisa atravessar um deserto cheio de obstáculos básicos. O objetivo é alcançar o outro lado do mapa antes que o tempo acabe. Ao longo do caminho, há pequenos desafios, como evitar áreas de areia movediça, cactos e pedras que surgem no caminho, para ultrapassar desses objetos o jogador dee responder uma pergunta.
