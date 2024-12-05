@@ -1,4 +1,4 @@
-class fase_demo extends Phaser.Scene {
+class fase_GrupoG extends Phaser.Scene {
     preload() {
         console.log('load assets');
         this.load.spritesheet('player_sp', 'assets/spritesheets/a-king.png', { frameWidth: 80, frameHeight: 58 });
@@ -18,8 +18,8 @@ class fase_demo extends Phaser.Scene {
 
         // associando os tilesets ao mapa
         this.tileset1 = this.map.addTilesetImage('CampoMinado', 'tiles1');
-        this.tileset2 = this.map.addTilesetImage('obstaculos', 'tiles2');
         this.tileset3 = this.map.addTilesetImage('sombra', 'tiles3');
+        this.tileset2 = this.map.addTilesetImage('obstaculos', 'tiles2');
 
         // criação das camadas
         this.groundLayer = this.map.createDynamicLayer('Chao', this.tileset1, 0, 0);
@@ -51,6 +51,7 @@ class fase_demo extends Phaser.Scene {
 
         // criar jogador 2
         this.player2 = this.physics.add.sprite(startX2, startY2, 'player_sp', 5);
+        console.log(this.player1)
         this.player2.setSize(60, 60);
         this.player2.setCollideWorldBounds(true);
 

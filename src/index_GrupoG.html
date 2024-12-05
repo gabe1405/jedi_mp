@@ -1,0 +1,52 @@
+<!doctype html> 
+    <!-- HTML Padrão -->
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Intro Phaser 3.</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+
+    <!-- adicione o arquivo da sua fase aqui  -->
+    <script src="src/fase_GrupoG.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- código javascript -->
+<script type="text/javascript">
+
+    // Configuração do jogo
+    var config = {
+        type: Phaser.AUTO,
+
+        // resolução e sistema de colisão.
+        width: 800,
+        height: 600,
+        physics: {
+              default: 'arcade',
+              arcade: {
+                  debug: true,
+              },
+        },
+
+        // tratamento dos gráficos: pixelado
+        render: {
+          antialiasGL: false,
+          pixelArt: true,
+        },
+
+        // funções da classe scene:
+        scene: [fase_GrupoG /*coloque o nome da sua fase aqui*/],
+    };
+
+    var game = new Phaser.Game(config);
+
+
+</script>
+
+</body>
+</html>
