@@ -13,66 +13,75 @@
 <body>
 <script>
 // Classe principal do jogo
-class GravityArrow extends Phaser.Scene {
+class fase_grupo6 extends Phaser.Scene {
 
-    // Carregar os assets
-    preload() {
-        console.log('Carregando assets...');
+// função para carregamento de assets
+preload ()
+{
+    console.log('load assets');
+    this.load.spritesheet('player_sp', './Download85343.png', { frameWidth: 78, frameHeight: 58 });
 
-        // Carregar o tileset (imagem usada pelo mapa)
-        this.load.image('tiles', './Mapa.png');
+    this.load.image('tiles', './Mapa.png');
 
-        // Carregar o mapa (JSON exportado pelo Tiled)
-        this.load.tilemapTiledJSON('map', './mapa.json');
+    this.load.tilemapTiledJSON('themap', './mapa.json');
+}
+
+// função para criação dos elementos
+create ()
+{
+
+    // criação do mapa e ligação com a imagem (tilesheet)
+    this.map = this.make.tilemap({ key: 'themap', tileWidth: 16, tileHeight: 16 });
+    this.tileset = this.map.addTilesetImage('intro_tileSet', 'tiles');
+
+    // criação das camadas
+    this.groundLayer = this.map.createDynamicLayer('ground', this.tileset, 0, 0);
+    this.wallsLayer = this.map.createDynamicLayer('walls', this.tileset, 0, 0);
+
+    // criação do rei
+    this.player = this.physics.add.sprite(100, 300, 'player_sp', 5);
+
+    // criação da colisão
+    this.wallsLayer.setCollisionBetween(30, 40, true)
+    this.physics.add.collider(this.player, this.wallsLayer);
+
+    // ligação das teclas de movimento
+    this.keyA = this.input.keyboard.addKey('A');
+    this.keyD = this.input.keyboard.addKey('D');
+    this.keyW = this.input.keyboard.addKey('W');
+    this.keyS = this.input.keyboard.addKey('S');
+    this.keySPACE = this.input.keyboard.addKey('SPACE');
+}
+
+
+// update é chamada a cada novo quadro
+update ()
+{
+    // velocidade horizontal
+    if (this.keyD?.isDown) {
+        this.player.setVelocityX(210);
+    }
+    else if (this.keyA?.isDown) {
+        this.player.setVelocityX(-210);
+    }
+    else{
+        this.player.setVelocityX(0); 
     }
 
-    // Criar a cena
-    create() {
-        console.log('Criando cena...');
-
-        // Criar o mapa com base no JSON carregado
-        const map = this.make.tilemap({ key: 'map' });
-
-        // Associar o tileset ao mapa
-        const tileset = map.addTilesetImage('mapa', './Mapa.png'); // Substitua 'Mapa' pelo nome do tileset no Tiled
-
-        const groundLayer = map.createLayer('ground', tileset, 0, 0); // Nome da camada no Tiled
-        const wallsLayer = map.createLayer('walls', tileset, 0, 0);   // Nome da camada no Tiled
-
-
-        // Configurar colisões na camada de paredes (walls)
-        wallsLayer.setCollisionByProperty({ collides: true });
-
-        // Adicionar um jogador ao mapa
-        this.player = this.physics.add.sprite(100, 100, null);
-        this.player.setCollideWorldBounds(true);
-
-        // Adicionar física às paredes
-        this.physics.add.collider(this.player, wallsLayer);
-
-        // Configurar controles
-        this.cursors = this.input.keyboard.createCursorKeys();
+    // velocidade vertical
+    if (this.keyW.isDown) {
+        this.player.setVelocityY(-210);
+    }
+    else if (this.keyS.isDown) {
+        this.player.setVelocityY(210);
+    }
+    else{
+        this.player.setVelocityY(0); 
     }
 
-    // Atualizar a cena a cada frame
-    update() {
-        // Movimentar o jogador
-        if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-200);
-        } else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(200);
-        } else {
-            this.player.setVelocityX(0);
-        }
 
-        if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-200);
-        } else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(200);
-        } else {
-            this.player.setVelocityY(0);
-        }
-    }
+}
+
 }
 
 // Configuração do jogo
@@ -86,7 +95,7 @@ const config = {
             debug: true,
         },
     },
-    scene: GravityArrow,
+    scene: fase_grupo6,
 };
 
 // Inicializar o jogo
