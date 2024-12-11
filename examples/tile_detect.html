@@ -58,9 +58,20 @@ class gravity_arrow extends Phaser.Scene {
 
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
+        // CRIA TEXTO COM O ID DO TILE
         var text_cfg = { font: "30px Arial", fill: "#FFC040", align: "center" }
         this.T1 = this.add.text(200, 100, "", text_cfg);
         this.T1.setScrollFactor(0);
+
+        // CRIA TEXTO COM OVERLAP
+        var text_cfg_2 = { font: "40px Arial", fill: "#FF20F0", align: "center" }
+        this.texts = this.physics.add.group();
+
+        this.T2 = this.add.text(300, 300, ":-)", text_cfg_2);
+        this.T3 = this.add.text(320, 100, ";o/", text_cfg_2);
+        this.texts.add(this.T2)
+        this.texts.add(this.T3)
+        this.physics.add.overlap(this.player, this.texts, text_collide_cback, null, this);
 
         console.log(this.T1)
         //console.log(this.map.getTile(this.player.body.x, this.player.body.y, this.wallsLayer, true));
@@ -118,10 +129,12 @@ class gravity_arrow extends Phaser.Scene {
         
 
     }
-
-
 }
-
+function text_collide_cback(player, text, scene){
+    console.log('foo');
+    text.setVisible(false);
+    this.T3.setText(':-(')
+}
 
 // Configuração do jogo
 var config = {
