@@ -19,8 +19,10 @@ class fase_grupo6 extends Phaser.Scene {
 preload ()
 {
     console.log('load assets');
-    this.load.spritesheet('player_sp', './Download85343.png', { frameWidth: 78, frameHeight: 58 });
-
+    this.load.spritesheet('player_sp', './Download85343.png', { frameWidth: 58, frameHeight: 38 });
+    this.load.image('tileset1', './A1_AnimatedGround.png'); // Primeiro tileset
+    this.load.image('tileset2', './A2_Ground.png'); // Segundo tileset
+    this.load.image('tileset3', './C_OutSide_Nature.png'); // Terceiro tileset
     this.load.image('tiles', './Mapa.png');
 
     this.load.tilemapTiledJSON('themap', './mapa.json');
@@ -30,22 +32,27 @@ preload ()
 create ()
 {
 
-    // criação do mapa e ligação com a imagem (tilesheet)
-    this.map = this.make.tilemap({ key: 'themap', tileWidth: 16, tileHeight: 16 });
-    this.tileset = this.map.addTilesetImage('intro_tileSet', 'tiles');
+    // Criação do mapa com o JSON
+    this.map = this.make.tilemap({ key: 'themap' });
 
-    // criação das camadas
-    this.groundLayer = this.map.createDynamicLayer('ground', this.tileset, 0, 0);
-    this.wallsLayer = this.map.createDynamicLayer('walls', this.tileset, 0, 0);
+    // Adicionando os tilesets ao mapa
+    const tileset1 = this.map.addTilesetImage('CHAO', 'tileset2');
+    const tileset2 = this.map.addTilesetImage('Obstaculos', 'tileset3');
+    const tileset3 = this.map.addTilesetImage('Agua', 'tileset1');
+    console.log(this.map.tilesets);
+    // Criação das camadas (layers) associadas aos tilesets
+    this.groundLayer = this.map.createLayer('Chao', [tileset1, tileset2, tileset3], 0, 0);
+    this.wallsLayer = this.map.createLayer('Obstaculos', [tileset1, tileset2, tileset3], 0, 0);
+    this.wallsLayer = this.map.createLayer('Agua', [tileset1, tileset2, tileset3], 0, 0);
 
-    // criação do rei
+    // Criação do player
     this.player = this.physics.add.sprite(100, 300, 'player_sp', 5);
 
-    // criação da colisão
-    this.wallsLayer.setCollisionBetween(30, 40, true)
+    // Configuração de colisão
+    this.wallsLayer.setCollisionBetween(30, 40, true);
     this.physics.add.collider(this.player, this.wallsLayer);
 
-    // ligação das teclas de movimento
+    // Configuração das teclas de movimento
     this.keyA = this.input.keyboard.addKey('A');
     this.keyD = this.input.keyboard.addKey('D');
     this.keyW = this.input.keyboard.addKey('W');
