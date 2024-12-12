@@ -19,7 +19,7 @@ class fase_grupo6 extends Phaser.Scene {
 preload ()
 {
     console.log('load assets');
-    this.load.spritesheet('player_sp', './Download85343.png', { frameWidth: 58, frameHeight: 38 });
+    this.load.spritesheet('player_sp', './Download85343.png', { frameWidth: 64, frameHeight: 64 });
     this.load.image('tileset1', './A1_AnimatedGround.png'); // Primeiro tileset
     this.load.image('tileset2', './A2_Ground.png'); // Segundo tileset
     this.load.image('tileset3', './C_OutSide_Nature.png'); // Terceiro tileset
@@ -47,6 +47,7 @@ create ()
 
     // Criação do player
     this.player = this.physics.add.sprite(100, 300, 'player_sp', 5);
+    this.player.setScale(0.2);
 
     // Configuração de colisão
     this.wallsLayer.setCollisionBetween(30, 40, true);
@@ -58,6 +59,11 @@ create ()
     this.keyW = this.input.keyboard.addKey('W');
     this.keyS = this.input.keyboard.addKey('S');
     this.keySPACE = this.input.keyboard.addKey('SPACE');
+
+    console.log(this) 
+    this.cameras.main.setZoom(1);
+    //this.cameras.main.centerToSize();
+    console.log(this)
 }
 
 
