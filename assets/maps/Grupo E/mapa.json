@@ -28,8 +28,17 @@
          "height":32,
          "name":"Obstaculos",
          "opacity":1,
+         "properties":
+            {
+             "collides":true
+            },
+         "propertytypes":
+            {
+             "collides":"bool"
+            },
          "type":"tilelayer",
          "visible":true,
+         "collides": true,
          "width":32,
          "x":0,
          "y":0
