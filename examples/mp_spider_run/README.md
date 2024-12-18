@@ -1,6 +1,6 @@
 # multiplayer example
-
-run with: node index.js
+npm install node
+run with: node spyder_index.js
 
 ## Install dependecies (linux)
 
