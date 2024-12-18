@@ -48,6 +48,7 @@ class gravity_arrow extends Phaser.Scene {
         this.player = this.physics.add.sprite(100, 300, 'player_sp', 5);
         this.arrow = this.physics.add.sprite(100, 100, 'arrow', 0);
         this.arrow.setScale(0.3)
+        //this.arrow.body.allowGravity = false
 
         // criação da colisão
         this.wallsLayer.setCollisionBetween(30, 40, true)
