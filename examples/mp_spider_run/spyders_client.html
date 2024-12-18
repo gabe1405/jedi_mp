@@ -1,0 +1,167 @@
+<!doctype html> 
+    <!-- HTML Padrão -->
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Intro Phaser 3.</title>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- código javascript -->
+<script type="text/javascript">
+
+class spyders extends Phaser.Scene {
+
+    // função para carregamento de assets
+    preload ()
+    {
+        console.log('load assets');
+        this.load.spritesheet("spider_sp", "spider11.png", {frameWidth: 64, frameHeight: 64});
+        //this.load.spritesheet("spider_sp", "assets/spider11.png", {frameWidth: 64, frameHeight: 64});
+
+        this.load.image('tiles', 'Terrain (32x32).png');
+
+        this.load.tilemapTiledJSON('themap', './mapa5.json');
+    }
+
+    // função para criação dos elementos
+    create ()
+    {
+        var self = this;
+        this.socket = io();
+        this.players = this.physics.add.group();
+        
+        this.socket.on('currentPlayers', function (players) {
+            Object.keys(players).forEach(function (id) {
+                if (players[id].playerId === self.socket.id) {
+                displayPlayers(self, players[id], 'spider_sp');
+                } else {
+                displayPlayers(self, players[id], 'spider_sp');
+                }
+            });
+        });
+
+        this.socket.on('newPlayer', function (playerInfo) {
+            displayPlayers(self, playerInfo, 'spider_sp');
+        });
+
+        this.socket.on('user_disconnect', function (playerId) {
+            self.players.getChildren().forEach(function (player) {
+                if (playerId === player.playerId) {
+                player.destroy();
+                }
+            });
+        });
+
+        this.socket.on('playerUpdates', function (players) {
+            Object.keys(players).forEach(function (id) {
+                self.players.getChildren().forEach(function (player) {
+                if (players[id].playerId === player.playerId) {
+                    player.setRotation(players[id].rotation);
+                    player.setPosition(players[id].x, players[id].y);
+                }
+                });
+            });
+        });
+
+
+        // criação do mapa e ligação com a imagem (tilesheet)
+        this.map = this.make.tilemap({ key: 'themap', tileWidth: 16, tileHeight: 16 });
+        this.tileset = this.map.addTilesetImage('Tileset_faseTeste', 'tiles');
+
+        // criação das camadas
+        this.groundLayer = this.map.createDynamicLayer('Chao', this.tileset, 0, 0);
+        this.wallsLayer = this.map.createDynamicLayer('Parede', this.tileset, 0, 0);
+
+        // criação do rei
+        //this.player = this.physics.add.sprite(100, 300, 'player_sp', 5);
+
+        // criação da colisão
+        //this.wallsLayer.setCollisionBetween(30, 40, true)
+        //this.physics.add.collider(this.player, this.wallsLayer);
+
+        // ligação das teclas de movimento
+        this.keyA = this.input.keyboard.addKey('A');
+        this.keyD = this.input.keyboard.addKey('D');
+        this.keyW = this.input.keyboard.addKey('W');
+        this.keyS = this.input.keyboard.addKey('S');
+        this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.a_pressed = false;
+        this.d_pressed = false;
+        this.w_pressed = false;
+        this.s_pressed = false;
+        this.space_pressed = false;
+
+        //this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+
+    }
+
+
+    // update é chamada a cada novo quadro
+    update (){
+        if (this.keyA.isDown !== this.a_pressed || this.keyD.isDown !== this.d_pressed || 
+            this.keyW.isDown !== this.w_pressed || this.keyS.isDown !== this.s_pressed || 
+            this.keySpace.isDown !== this.space_pressed){
+            
+            this.socket.emit('playerInput', {left: this.keyA.isDown, right: this.keyD.isDown, up: this.keyW.isDown});
+            console.log({left: this.keyA.isDown, right: this.keyS.isDown, up: this.keyW.isDown});
+        }    
+        this.a_pressed = this.keyA.isDown;
+        this.d_pressed = this.keyD.isDown;
+        this.w_pressed = this.keyW.isDown;
+        this.s_pressed = this.keyS.isDown;
+        this.space_pressed = this.keySpace.isDown;
+    }
+}
+
+function displayPlayers(self, playerInfo, sprite) {
+    console.log('disp player', playerInfo)
+    const player = self.add.sprite(playerInfo.x, playerInfo.y, sprite).setOrigin(0.5, 0.5).setScale(0.5);
+    if (playerInfo.team === 'blue') player.setTint(0x0000ff);
+    else player.setTint(0xff0000);
+    player.playerId = playerInfo.playerId;
+    self.players.add(player);
+  }
+
+
+// Configuração do jogo
+var config = {
+    type: Phaser.AUTO,
+
+    // resolução e sistema de colisão.
+    width: 800,
+    height: 600,
+    physics: {
+            default: 'arcade',
+            arcade: {
+                debug: true,
+            },
+    },
+
+    // tratamento dos gráficos: pixelado
+    render: {
+        antialiasGL: false,
+        pixelArt: true,
+    },
+
+    // funções da classe scene:
+    scene: [spyders],
+};
+
+
+
+var game = new Phaser.Game(config);
+
+</script>
+
+</body>
+</html>
