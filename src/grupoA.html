@@ -75,9 +75,11 @@
 
         // criação do rei
         king = this.physics.add.sprite(100, 300, 'king_sp', 5);
+        king.setSize(20, 22);
+        king.setOffset(22,20);
 
         // criação da colisão
-        this.wallsLayer.setCollisionBetween(30, 40, true)
+        this.wallsLayer.setCollisionBetween(0, 101, true)
         this.physics.add.collider(king, this.wallsLayer);
 
         // ligação das teclas de movimento
