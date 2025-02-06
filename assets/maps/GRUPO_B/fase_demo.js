@@ -8,6 +8,14 @@ class fase_demo extends Phaser.Scene {
         
         // Direção padrão do jogador (para projétil, flip, etc.)
         this.lastDirection = 'down';
+
+        // Vida do jogador
+        this.playerHealth = 100;
+        this.damageAmount = 20; // Dano ao colidir com inimigo
+
+        // Configuração de ondas de inimigos
+        this.waveCount = 0;
+        this.enemiesPerWave = 20;
     }
 
     preload() {
@@ -142,15 +150,22 @@ class fase_demo extends Phaser.Scene {
         this.enemies = this.physics.add.group();
 
         // Exemplo: criar vários inimigos de forma aleatória
-        for (let i = 0; i < 10; i++) {
-            let x = Phaser.Math.Between(100, 800);
-            let y = Phaser.Math.Between(100, 1800);
+        /*for (let i = 0; i < 50; i++) {
+            let x = Phaser.Math.Between(100, 2000);
+            let y = Phaser.Math.Between(100, 2000);
             let enemy = this.enemies.create(x, y, 'star');
             enemy.setCollideWorldBounds(true);
             enemy.setBounce(1);
             enemy.body.allowGravity = false;
             enemy.setScale(0.4);
-        }
+        }*/
+
+        // Criar grupo de inimigos
+        this.enemies = this.physics.add.group();
+
+        // Iniciar ondas de inimigos
+        this.spawnWave();
+        this.time.addEvent({ delay: 30000, callback: this.spawnWave, callbackScope: this, loop: true });
 
         // Faz inimigos colidirem com paredes
         this.physics.add.collider(this.enemies, this.wallsLayer);
@@ -168,6 +183,13 @@ class fase_demo extends Phaser.Scene {
 
             // Exemplo: depois de 500ms, voltar para idle. 
             // Você pode colocar lógica de vida/dano aqui.
+            // Exibir vida na tela
+            this.healthText = this.add.text(10, 10, 'Vida: ' + this.playerHealth, { fontSize: '20px', fill: '#fff' });
+            this.healthText.setScrollFactor(0); // Fixa na tela
+
+            // Overlap entre jogador e inimigos para causar dano
+            this.physics.add.overlap(this.player, this.enemies, this.takeDamage, null, this);
+
             this.time.delayedCall(500, () => {
                 // Só volta para idle se o jogador não estiver pressionando tecla de movimento ou atacando.
                 if (!this.keyA.isDown && !this.keyD.isDown && !this.keyW.isDown && !this.keyS.isDown) {
@@ -176,6 +198,49 @@ class fase_demo extends Phaser.Scene {
             });
 
         }, null, this);
+
+
+    }
+
+    spawnWave() {
+        this.waveCount++;
+        for (let i = 0; i < this.enemiesPerWave; i++) {
+            let x = Phaser.Math.Between(100, 2000);
+            let y = Phaser.Math.Between(100, 2000);
+            let enemy = this.enemies.create(x, y, 'star');
+            enemy.setCollideWorldBounds(true);
+            enemy.setBounce(1);
+            enemy.body.allowGravity = false;
+            enemy.setScale(0.4);
+        }
+    }
+
+    takeDamage(player, enemy) {
+        if (this.playerHealth > 0) {
+            this.playerHealth -= this.damageAmount;
+            this.healthText.setText('Vida: ' + this.playerHealth);
+            this.player.anims.play('hurt', true);
+            
+            if (this.playerHealth <= 0) {
+                this.gameOver();
+            } else {
+                this.time.delayedCall(500, () => {
+                    if (!this.keyA.isDown && !this.keyD.isDown && !this.keyW.isDown && !this.keyS.isDown) {
+                        this.player.anims.play('idle', true);
+                    }
+                });
+            }
+        }
+    }
+
+    gameOver() {
+        this.player.setTint(0xff0000);
+        this.player.setVelocity(0);
+        this.player.anims.play('hurt', true);
+        this.add.text(400, 300, 'Game Over', { fontSize: '40px', fill: '#ff0000' }).setOrigin(0.5);
+        this.time.delayedCall(2000, () => {
+            this.scene.restart();
+        });
     }
 
     update() {
