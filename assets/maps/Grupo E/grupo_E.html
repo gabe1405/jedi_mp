@@ -16,8 +16,8 @@
 class fase_grupo6 extends Phaser.Scene {
 
 // função para carregamento de assets
-preload ()
-{
+preload () 
+{ 
     console.log('load assets');
     this.load.spritesheet('player_sp', './Download85343.png', { frameWidth: 64, frameHeight: 64 });
     this.load.image('tileset1', './A1_AnimatedGround.png'); // Primeiro tileset
@@ -26,9 +26,9 @@ preload ()
     this.load.image('tiles', './Mapa.png');
 
     this.load.tilemapTiledJSON('themap', './mapa.json');
+    console.log('load assets done');
 }
 
-// função para criação dos elementos
 create() {
     this.map = this.make.tilemap({ key: 'themap' });
 
@@ -40,20 +40,33 @@ create() {
     this.groundLayer = this.map.createLayer('Chao', [tileset1, tileset2, tileset3], 0, 0);
     this.wallsLayer = this.map.createLayer('Obstaculos', [tileset1, tileset2, tileset3], 0, 0);
     this.destinyLayer = this.map.createLayer('Agua', [tileset1, tileset2, tileset3], 0, 0);
+    
+    
+
+
 
     // Configuração de colisão por propriedade
     this.wallsLayer.setCollisionByProperty({ collides: true });
 
-
     // Criação do player
     this.player = this.physics.add.sprite(25, 20, 'player_sp', 5);
     this.player.setScale(0.4);
+    this.player.body.setSize(40, 40).setOffset(12, 12); // Ajuste conforme necessário
 
-    // Ajuste do tamanho do corpo do jogador, se necessário
-    this.player.body.setSize(32, 32).setOffset(16, 16);
 
     // Adiciona colisão entre jogador e camadas
-    this.physics.add.collider(this.player, this.wallsLayer);
+    this.physics.add.collider(this.player, this.wallsLayer, () => {
+    console.log("Colisão detectada!");
+});
+
+
+    // Adiciona limites físicos ao mundo
+    const mapWidth = this.map.widthInPixels;
+    const mapHeight = this.map.heightInPixels;
+    this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
+
+    // Impede o jogador de sair dos limites do mapa
+    this.player.setCollideWorldBounds(true);
 
     // Configurações de teclas
     this.keyA = this.input.keyboard.addKey('A');
@@ -61,18 +74,12 @@ create() {
     this.keyW = this.input.keyboard.addKey('W');
     this.keyS = this.input.keyboard.addKey('S');
     this.keySPACE = this.input.keyboard.addKey('SPACE');
-    console.log(this.map.tilesets); // Verifique os tilesets carregados
-console.log(this.wallsLayer.layer); // Veja as camadas e seus dados
-
 
     // Câmera
-    const mapWidth = this.map.widthInPixels;
-    const mapHeight = this.map.heightInPixels;
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
     this.cameras.main.startFollow(this.player);
     this.cameras.main.setZoom(2.3);
 }
-
 
 // update é chamada a cada novo quadro
 update ()
