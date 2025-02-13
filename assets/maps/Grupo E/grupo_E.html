@@ -26,7 +26,7 @@ preload ()
     this.load.image('tiles', './Mapa.png');
 
     this.load.tilemapTiledJSON('themap', './mapa.json');
-    console.log('load assets done');
+    console.log('load assets done!!');
 }
 
 create() {
@@ -75,6 +75,12 @@ create() {
     this.keyS = this.input.keyboard.addKey('S');
     this.keySPACE = this.input.keyboard.addKey('SPACE');
 
+    // CRIA TEXTO COM O ID DO TILE
+    var text_cfg = { font: "10px Arial", fill: "#00C040", align: "center" }
+    this.T1 = this.add.text(50, 50, "", text_cfg);
+    //this.T1.setScrollFactor(0);
+
+
     // Câmera
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
     this.cameras.main.startFollow(this.player);
@@ -105,6 +111,16 @@ update ()
     else{
         this.player.setVelocityY(0); 
     }
+
+
+    var tile = this.wallsLayer.getTileAtWorldXY(this.player.x, this.player.y);
+    if (tile == null){
+        this.T1.setText("ID: 0");
+    }
+    else{
+        this.T1.setText("ID: " + tile.index);
+    }
+        
 
 
 }
