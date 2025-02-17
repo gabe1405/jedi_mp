@@ -44,18 +44,26 @@ create() {
     
 
 
+    this.lives = 3;
+    this.invulnerableTime = 0; // Tempo de espera para perder outra vida
+    // Criando HUD de vidas
+    this.livesText = this.add.text(250, 1, "Vidas: " + this.lives, { 
+        font: "10px Arial", 
+        fill: "#FFFFFF",
+        padding: { x: 250, y: 200 }
+    }).setScrollFactor(0); // Mantém o texto fixo na tela
 
     // Configuração de colisão por propriedade
     this.wallsLayer.setCollisionByProperty({ collides: true });
 
     // Criação do player
-    this.player = this.physics.add.sprite(25, 20, 'player_sp', 5);
+    this.player = this.physics.add.sprite(25, 35, 'player_sp', 5);
     this.player.setScale(0.4);
     this.player.body.setSize(40, 40).setOffset(12, 12); // Ajuste conforme necessário
 
 
     // Adiciona colisão entre jogador e camadas
-    this.physics.add.collider(this.player, this.wallsLayer, () => {
+    this.physics.add.collider(this.player, this.destinyLayer, () => {
     console.log("Colisão detectada!");
 });
 
@@ -88,45 +96,122 @@ create() {
 }
 
 // update é chamada a cada novo quadro
-update ()
-{
-    // velocidade horizontal
-    if (this.keyD?.isDown) {
-        this.player.setVelocityX(210);
-    }
-    else if (this.keyA?.isDown) {
-        this.player.setVelocityX(-210);
-    }
-    else{
-        this.player.setVelocityX(0); 
-    }
+update() {
+        let speed = 210;
+        let moveX = 0;
+        let moveY = 0;
 
-    // velocidade vertical
-    if (this.keyW.isDown) {
-        this.player.setVelocityY(-210);
-    }
-    else if (this.keyS.isDown) {
-        this.player.setVelocityY(210);
-    }
-    else{
-        this.player.setVelocityY(0); 
-    }
+        // Atualiza cooldown de invulnerabilidade
+        if (this.invulnerableTime > 0) {
+            this.invulnerableTime -= this.game.loop.delta / 1000; // Converte para segundos
+        }
 
+        // Verifica se pode mover horizontalmente
+        if (this.keyD.isDown) {
+            let tileRight = this.wallsLayer.getTileAtWorldXY(this.player.x + 15, this.player.y);
+            if (!tileRight || tileRight.index === 0) {
+                moveX = speed;
+            } else {
+                this.tryLoseLife();
+            }
+        } else if (this.keyA.isDown) {
+            let tileLeft = this.wallsLayer.getTileAtWorldXY(this.player.x - 15, this.player.y);
+            if (!tileLeft || tileLeft.index === 0) {
+                moveX = -speed;
+            } else {
+                this.tryLoseLife();
+            }
+        }
 
-    var tile = this.wallsLayer.getTileAtWorldXY(this.player.x, this.player.y);
+        // Verifica se pode mover verticalmente
+        if (this.keyW.isDown) {
+            let tileUp = this.wallsLayer.getTileAtWorldXY(this.player.x, this.player.y - 15);
+            if (!tileUp || tileUp.index === 0) {
+                moveY = -speed;
+            } else {
+                this.tryLoseLife();
+            }
+        } else if (this.keyS.isDown) {
+            let tileDown = this.wallsLayer.getTileAtWorldXY(this.player.x, this.player.y + 15);
+            if (!tileDown || tileDown.index === 0) {
+                moveY = speed;
+            } else {
+                this.tryLoseLife();
+            }
+        }
+
+        // Aplica o movimento final
+        this.player.setVelocity(moveX, moveY);
+        var tile = this.wallsLayer.getTileAtWorldXY(this.player.x, this.player.y);
     if (tile == null){
         this.T1.setText("ID: 0");
     }
-    else{
-        this.T1.setText("ID: " + tile.index);
+        // Debug: Mostra o ID do tile onde o jogador está
+        let currentTile = this.wallsLayer.getTileAtWorldXY(this.player.x, this.player.y);
+        this.livesText.setText("Vidas: " + this.lives);
     }
-        
 
+    //Verifica se pode perder uma vida (com cooldown)
+    tryLoseLife() {
+        if (this.invulnerableTime <= 0) {
+            this.loseLife();
+            this.invulnerableTime = 1; // 1 segundo de invulnerabilidade
+        }
+    }
 
+    // Função para perder uma vida
+    loseLife() {
+        this.lives--; // Reduz uma vida
+        this.livesText.setText("Vidas: " + this.lives); // Atualiza o texto na tela
+
+        if (this.lives <= 0) {
+            this.gameOver();
+        } else {
+            this.respawnPlayer();
+        }
+    }
+
+    //Função para reiniciar o jogador em um ponto seguro
+    respawnPlayer() {
+        this.player.setPosition(25, 20); // Define a posição inicial novamente
+        console.log("Jogador reiniciado!");
+    }
+
+    //Função para lidar com o game over
+    gameOver() {
+    // Cria fundo preto
+    let gameOverScreen = this.add.rectangle(
+                this.cameras.main.width / 2, 
+                this.cameras.main.height / 2, 
+                this.cameras.main.width, 
+                this.cameras.main.height, 
+                0x000000
+            ).setOrigin(0.5).setScrollFactor(0);
+
+            // Texto "GAME OVER"
+            let gameOverText = this.add.text(
+                this.cameras.main.width / 2, 
+                this.cameras.main.height / 2 - 50, 
+                "GAME OVER", 
+                { font: "50px Arial", fill: "#FF0000", fontWeight: "bold" }
+            ).setOrigin(0.5).setScrollFactor(0);
+
+            // Botão de reiniciar
+            let restartButton = this.add.text(
+                this.cameras.main.width / 2, 
+                this.cameras.main.height / 2 + 20, 
+                "Reiniciar", 
+                { font: "30px Arial", fill: "#FFFFFF", backgroundColor: "#FF0000", padding: { x: 10, y: 5 } }
+            ).setOrigin(0.5).setScrollFactor(0);
+
+            // Torna o botão clicável
+            restartButton.setInteractive();
+            restartButton.on('pointerdown', () => {
+                this.scene.restart();
+            });
 }
 
 }
-
 // Configuração do jogo
 const config = {
     type: Phaser.AUTO,
