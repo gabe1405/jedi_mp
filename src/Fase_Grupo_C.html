@@ -1,13 +1,11 @@
 <!doctype html>
-<!-- HTML Padrão -->
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
-    <title>Grupo C</title>
+    <title>Batalha dos Coelhos</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
-
-    <style type="text/css">
+    <style>
         body {
             margin: 0;
         }
@@ -15,261 +13,326 @@
 </head>
 
 <body>
+    <script>
 
-    <!-- código javascript -->
-    <script type="text/javascript">
+        class HealthBar {
+            constructor(scene, x, y) {
+                this.bar = new Phaser.GameObjects.Graphics(scene);
+                this.x = x;
+                this.y = y;
+                this.value = 100;
+                this.p = 76 / 100;
+                this.draw();
+                scene.add.existing(this.bar);
+            }
 
-        class fase_1 extends Phaser.Scene {
+            decrease(amount) {
+                console.log('d', this.value);
+                this.value -= amount;
+                if (this.value < 0) {
+                    this.value = 0;
+                }
+                this.draw();
+                return (this.value === 0);
+            }
 
-            // função para carregamento de assets
+            draw() {
+                this.bar.clear();
+                this.bar.fillStyle(0x000000);
+                this.bar.fillRect(this.x, this.y, 80, 16);
+                this.bar.fillStyle(0xffffff);
+                this.bar.fillRect(this.x + 2, this.y + 2, 76, 12);
+
+                if (this.value < 30) {
+                    this.bar.fillStyle(0xff0000);
+                } else {
+                    this.bar.fillStyle(0x00ff00);
+                }
+
+                var d = Math.floor(this.p * this.value);
+                this.bar.fillRect(this.x + 2, this.y + 2, d, 12);
+            }
+        }
+
+        class Menu extends Phaser.Scene {
+            constructor() {
+                super({ key: 'Menu' });
+            }
+
             preload() {
-                console.log('load assets');
+                this.load.audio('backgroundMusic1', 'assets/music/Grupo_C/music1.mp3'); // Carregar a música
+                this.load.audio('backgroundMusic2', 'assets/music/Grupo_C/music2.mp3'); // Carregar a música
+                this.load.audio('backgroundMusic3', 'assets/music/Grupo_C/music3.mp3'); // Carregar a música
+                this.load.audio('backgroundMusic4', 'assets/music/Grupo_C/music4.mp3'); // Carregar a música
+                this.load.audio('backgroundMusic5', 'assets/music/Grupo_C/music5.mp3'); // Carregar a música
+                this.load.image('backgroundImage', 'assets/others/Grupo_C/menu.png');
+                this.load.image('startButton', 'assets/others/Grupo_C/botao_menu.jpg');
+            }
 
-                // Carregar a imagem do sprite do jogador
+            create() {
+                // Adicionar fundo à cena
+                this.add.image(640, 480, 'backgroundImage').setDisplaySize(1280, 960); // Definindo o fundo para preencher a tela
+
+                // Criar o botão, definir tamanho e centralizá-lo
+                const startButton = this.add.image(640, 540, 'startButton')
+                    .setDisplaySize(300, 100)  // Redefine o tamanho do botão (largura: 200px, altura: 100px)
+                    .setInteractive();  // Torna o botão interativo
+
+                startButton.on('pointerdown', () => {
+                    this.scene.start('Movimentos');
+                    this.scene.stop('Menu'); // Garantir que a cena de menu seja parada
+                });
+
+                // Adiciona animação no botão
+                startButton.on('pointerover', () => {
+                    startButton.setScale(1.1);  // Aumenta o tamanho ao passar o mouse
+                });
+
+                startButton.on('pointerout', () => {
+                    startButton.setScale(1);  // Restaura o tamanho original
+                });
+
+
+                // Tocar a música de fundo
+                const random = Math.floor(Math.random() * 5) + 1; // Número aleatório entre 1
+                if (random === 1) {
+                    this.music = this.sound.add('backgroundMusic1');
+                    this.music.setLoop(true); // Loop infinito
+                    this.music.play();
+                } else if (random === 2) {
+                    this.music = this.sound.add('backgroundMusic2');
+                    this.music.setLoop(true); // Loop infinito
+                    this.music.play();
+                } else if (random === 3) {
+                    this.music = this.sound.add('backgroundMusic3');
+                    this.music.setLoop(true); // Loop infinito
+                    this.music.play();
+                } else if (random === 4) {
+                    this.music = this.sound.add('backgroundMusic4');
+                    this.music.setLoop(true); // Loop infinito
+                    this.music.play();
+                } else {
+                    this.music = this.sound.add('backgroundMusic5');
+                    this.music.setLoop(true); // Loop infinito
+                    this.music.play();
+                }
+            }
+        }
+
+        class Movimentos extends Phaser.Scene {
+            constructor() {
+                super({ key: 'Movimentos' });
+            }
+
+            preload() {
+                // Carregar imagens e recursos para a nova cena
+                this.load.image('backgroundImage2', 'assets/others/Grupo_C/movimentos.jpg'); // Nova imagem de fundo
+                this.load.image('nextButton', 'assets/others/Grupo_C/botao_movimentos.jpg'); // Novo botão
+            }
+
+            create() {
+                // Adicionar fundo da nova cena
+                this.add.image(640, 480, 'backgroundImage2').setDisplaySize(1280, 960); // Ajuste o fundo para a tela inteira
+
+                // Criar novo botão e centralizá-lo
+                const newButton = this.add.image(1000, 900, 'nextButton')
+                    .setDisplaySize(300, 100)  // Redefine o tamanho do novo botão
+                    .setInteractive();  // Torna o botão interativo
+
+                newButton.on('pointerdown', () => {
+                    this.scene.start('Guerra_de_Coelhos'); // Inicia a próxima cena ou ação desejada
+                    this.scene.stop('Movimentos'); // Opcional: parar a cena atual
+                });
+
+                // Adiciona animação no novo botão
+                newButton.on('pointerover', () => {
+                    newButton.setScale(1.1);  // Aumenta o tamanho do botão ao passar o mouse
+                });
+
+                newButton.on('pointerout', () => {
+                    newButton.setScale(1);  // Restaura o tamanho original
+                });
+            }
+        }
+
+        class GameOver extends Phaser.Scene {
+            constructor() {
+                super({ key: 'GameOver' });
+            }
+
+            init(data) {
+                this.winner = data.winner;
+            }
+
+            preload() {
+                this.load.image('gameOverBackground', 'assets/others/Grupo_C/gameover.png');
+                this.load.image('restartButton', 'assets/others/Grupo_C/botao_reiniciar.png');
+                this.load.audio('vitoriaSound', 'assets/music/Grupo_C/Vitoria.mp3');
+            }
+
+            create() {
+                this.add.image(640, 480, 'gameOverBackground').setDisplaySize(1280, 960);
+                this.add.text(640, 730, `${this.winner}!`, {
+                    fontSize: '48px',
+                    fill: '#ffffff'
+                }).setOrigin(0.5); // Centraliza o texto na tela
+
+                // Criar novo botão e centralizá-lo
+                const restartButton = this.add.image(1000, 900, 'restartButton')
+                    .setDisplaySize(300, 100)  // Redefine o tamanho do novo botão
+                    .setInteractive();  // Torna o botão interativo
+
+                restartButton.on('pointerdown', () => {
+                    location.reload(); // Recarrega a página completamente
+                });
+
+
+                // Adiciona animação no novo botão
+                restartButton.on('pointerover', () => {
+                    restartButton.setScale(1.1);  // Aumenta o tamanho do botão ao passar o mouse
+                });
+
+                restartButton.on('pointerout', () => {
+                    restartButton.setScale(1);  // Restaura o tamanho original
+                });
+            }
+        }
+
+        class Guerra_de_Coelhos extends Phaser.Scene {
+            constructor() {
+                super({ key: 'Guerra_de_Coelhos' });
+            }
+
+            preload() {
+
                 this.load.spritesheet('player1', 'assets/spritesheets/Grupo_C/BunnyWalk-Sheet.png', { frameWidth: 32, frameHeight: 32 });
                 this.load.spritesheet('player2', 'assets/spritesheets/Grupo_C/BunnyIdleF.png', { frameWidth: 32, frameHeight: 32 });
-                // Carregar os tilesets do mapa
                 this.load.image('Tile_Asset_Png', 'assets/maps/Grupo_C/Tile_Asset_Png.png');
-                // Carregar o arquivo de mapa JSON
-                this.load.tilemapTiledJSON('themap', 'assets/maps/Grupo_C/Mapa_Json.json');
-                // Carregar a imagem da flecha
-                this.load.image('arrow1', 'assets/spritesheets/Grupo_C/image.png');
-                this.load.image('arrow2', 'assets/spritesheets/Grupo_C/image1.png');
+                this.load.tilemapTiledJSON('themap', 'assets/maps/Grupo_C/Mapa.json');
+                this.load.image('arrow', 'assets/spritesheets/Grupo_C/image.png');
+                this.load.audio('hitSound', 'assets/music/Grupo_C/hit.mp3'); // Carregar a música
+                this.load.audio('vitoriaSound', 'assets/music/Grupo_C/Vitoria.mp3'); // Carregar a música
             }
 
-            // função para criação dos elementos
             create() {
-                // Criação do mapa e associação das imagens de tileset
-                this.map = this.make.tilemap({ key: 'themap', tileWidth: 16, tileHeight: 16 });
 
-                // Guardar os tilesets em um objeto para facilitar o acesso
-                this.tileset = this.map.addTilesetImage('Tile_Asset_Png', 'Tile_Asset_Png'),
+                // Carregar o efeito sonoro
+                this.hitSound = this.sound.add('hitSound');
+                this.vitoriaSound = this.sound.add('vitoriaSound');
 
-                    // Criação das camadas na ordem desejada (do fundo para o topo)
-                    this.backLayer = this.map.createDynamicLayer('Back', this.tileset, 0, 0);
-                this.backLayer.setDepth(0); // Definindo profundidade
+                const map = this.make.tilemap({ key: 'themap' });
+                const tileset = map.addTilesetImage('Tile_Asset_Png');
+                this.backgroundLayer = map.createStaticLayer('Back', tileset, 0, 0);
+                this.plataformaLayer = map.createStaticLayer('Plataforma', tileset, 0, 0);
+                this.plataformaLayer.setCollisionByExclusion([-1]);
 
-                this.leader = this.map.createDynamicLayer('Escadas', this.tileset, 0, 0);
-                this.leader.setDepth(1);
+                this.player1 = this.physics.add.sprite(100, 100, 'player1', 0).setCollideWorldBounds(true);
+                this.player2 = this.physics.add.sprite(1200, 100, 'player2', 0).setCollideWorldBounds(true);
 
-                this.plataformaLayer = this.map.createDynamicLayer('Plataforma', this.tileset, 0, 0);
-                this.plataformaLayer.setDepth(2);
+                this.physics.add.collider(this.player1, this.plataformaLayer);
+                this.physics.add.collider(this.player2, this.plataformaLayer);
 
-                // criação do jogador 1
-                this.player1 = this.physics.add.sprite(200, 100, 'player1', 5);
-                this.player1.setDepth(3); // O jogador fica acima das camadas
-                this.player2 = this.physics.add.sprite(1200, 100, 'player2', 5);
-                this.player2.setDepth(3); // O jogador fica acima das camadas
-                this.arrow1 = this.physics.add.sprite(200, 100, 'arrow1');
-                this.arrow1.setScale(0.03);
-                this.arrow1.setDepth(3);
+                this.anims.create({ key: 'left1', frames: this.anims.generateFrameNumbers('player1', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
+                this.anims.create({ key: 'right1', frames: this.anims.generateFrameNumbers('player1', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
+                this.anims.create({ key: 'idle1', frames: [{ key: 'player1', frame: 0 }], frameRate: 10 });
 
-                this.arrow2 = this.physics.add.sprite(1200, 100, 'arrow2');
-                this.arrow2.setScale(0.03);
-                this.arrow2.setDepth(3);
+                this.anims.create({ key: 'left2', frames: this.anims.generateFrameNumbers('player2', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
+                this.anims.create({ key: 'right2', frames: this.anims.generateFrameNumbers('player2', { start: 0, end: 3 }), frameRate: 10, repeat: -1 })
+                this.anims.create({ key: 'idle2', frames: [{ key: 'player2', frame: 0 }], frameRate: 10 });
 
-                // Definir colisão para a camada de plataforma
-                this.plataformaLayer.setCollisionByExclusion([-1]); // Configura colisão para todos os tiles, exceto o vazio
+                this.cursors1 = this.input.keyboard.addKeys('W,A,S,D,SPACE');
+                this.cursors2 = this.input.keyboard.addKeys('UP,LEFT,DOWN,RIGHT,ENTER');
 
-                // Adicionar colisão entre o jogador e cada camada de colisão
-                this.physics.add.collider(this.player1, this.plataformaLayer, false);
-                this.physics.add.collider(this.player2, this.plataformaLayer, false);
-                //this.physics.add.collider(this.arrow1, this.plataformaLayer, arrow1HitWall);
+                this.healthBar1 = new HealthBar(this, 195, 10);
+                this.healthBar2 = new HealthBar(this, 1000, 10);
 
-                // Definir as teclas de movimento
-                this.keyA = this.input.keyboard.addKey('A');
-                this.keyD = this.input.keyboard.addKey('D');
-                this.keyW = this.input.keyboard.addKey('W');
-                this.keyS = this.input.keyboard.addKey('S');
-                this.keyRight = this.input.keyboard.addKey('RIGHT');
-                this.keyLeft = this.input.keyboard.addKey('LEFT');
-                this.keyUp = this.input.keyboard.addKey('UP');
-                this.keyDown = this.input.keyboard.addKey('DOWN');
-
-                this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-                this.keySpace2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-                this.space_pressed = false;
-                this.space_pressed2 = false;
+                this.players = [
+                    { sprite: this.player1, cursors: this.cursors1, arrow: this.physics.add.image(-50, -50, 'arrow').setScale(0.03), animPrefix: '1', shoot_angle: 0, healthBar: this.healthBar1 },
+                    { sprite: this.player2, cursors: this.cursors2, arrow: this.physics.add.image(-50, -50, 'arrow').setScale(0.03), animPrefix: '2', shoot_angle: 0, healthBar: this.healthBar2 }
+                ];
 
 
-                this.graphics1 = this.add.graphics({ lineStyle: { width: 2, color: 0x00aaaa }, fillStyle: { color: 0x0000aa } });
-                this.circle = new Phaser.Geom.Circle(this.player1.x, this.player1.y, 64);
-                this.line = new Phaser.Geom.Line(this.player1.x - 20, this.player1.y, this.player1.x + 20, this.player1.y);
-                this.shoot_angle = 0;
+                this.players.forEach(player => {
+                    player.arrow.setCollideWorldBounds(true);
+                    player.arrow.body.setAllowGravity(false);
+                });
+                console.log(this.players[0])
 
-                this.graphics2 = this.add.graphics({ lineStyle: { width: 2, color: 0x00aaaa }, fillStyle: { color: 0x0000aa } });
-                this.circle2 = new Phaser.Geom.Circle(this.player2.x, this.player2.y, 64);
-                this.line2 = new Phaser.Geom.Line(this.player2.x - 20, this.player2.y, this.player2.x + 20, this.player2.y);
-                this.shoot_angle2 = 0;
 
-                //this.player1.setgravityY = 300; // Adiciona gravidade ao jogador
-                this.physics.world.gravity.y = 800; // Adiciona gravidade ao mundo
             }
 
-            // update é chamada a cada novo quadro
             update() {
-                // velocidade horizontal
-                if (this.keyD?.isDown) {
-                    this.player1.setVelocityX(210);
-                    this.shoot_angle -= 0.01;
-                } else if (this.keyA?.isDown) {
-                    this.player1.setVelocityX(-210);
-                    this.shoot_angle += 0.01;
-                } else {
-                    this.player1.setVelocityX(0);
-                    this.shoot_angle = 0;
-                }
+                this.players.forEach(player => {
+                    const { sprite, cursors, arrow, animPrefix, healthBar } = player;
 
-                // velocidade vertical
-                if (this.keyW.isDown && this.player1.body.onFloor()) {  // verifica se o jogador está no chão antes de pular
-                    this.player1.setVelocityY(-360);
-                } else if (this.keyS.isDown) {
-                    this.player1.setVelocityY(210);
-                } else {
-                    //  this.player1.setVelocityY(0); 
-                    this.shoot_angle = 0;
-                }
-
-                //Player 2
-                if (this.keyRight.isDown) {
-                    this.player2.setVelocityX(210);
-                    this.shoot_angle2 -= 0.01;
-                } else if (this.keyLeft.isDown) {
-                    this.player2.setVelocityX(-210);
-                    this.shoot_angle2 += 0.01;
-                } else {
-                    this.player2.setVelocityX(0);
-                    this.shoot_angle2 = 0;
-                }
-
-                if (this.keyUp.isDown && this.player2.body.onFloor()) {
-                    this.player2.setVelocityY(-360);
-                } else if (this.keyDown.isDown) {
-                    this.player2.setVelocityY(210);
-                } else {
-                    //this.player2.setVelocityY(0);
-                    this.shoot_angle2 = 0;
-                }
-
-                if (this.shoot_angle > 1)
-                    this.shoot_angle -= 1;
-                if (this.shoot_angle < 0)
-                    this.shoot_angle += 1;
-
-                if (this.shoot_angle2 > 1)
-                    this.shoot_angle2 -= 1;
-                if (this.shoot_angle2 < 0)
-                    this.shoot_angle2 += 1;
-
-                if (!this.keySpace.isDown && this.space_pressed) {
-                    this.graphics1.clear();
-                    this.arrow1.setPosition(this.player1.x, this.player1.y)
-                    this.arrow1.setVelocityX(270 * Math.cos(this.shoot_angle * 2 * 3.14))
-                    this.arrow1.setVelocityY(270 * Math.sin(this.shoot_angle * 2 * 3.14))
-                    this.arrow1.setRotation(this.shoot_angle * 2 * 3.14 - 3 * 3.14 / 2);
-                    if (this.keyA.isDown) {
-                        this.arrow1.setVelocityX(-270 * Math.cos(this.shoot_angle * 2 * 3.14))
-                        this.arrow1.setVelocityY(-270 * Math.sin(this.shoot_angle * 2 * 3.14))
-                        this.arrow1.setRotation(-this.shoot_angle * 2 * 3.14 - 3.14 / 2);
+                    if (cursors.A?.isDown || cursors.LEFT?.isDown) {
+                        sprite.setVelocityX(-160);
+                        sprite.anims.play('left' + animPrefix, true);
+                        player.shoot_angle += 0.01;
+                    } else if (cursors.D?.isDown || cursors.RIGHT?.isDown) {
+                        sprite.setVelocityX(160);
+                        sprite.anims.play('right' + animPrefix, true);
+                        player.shoot_angle -= 0.01;
+                    } else if (cursors.S?.isDown || cursors.DOWN?.isDown) {
+                        sprite.setVelocityX(0);
+                        sprite.setVelocityY(160);
+                        //sprite.anims.play('idle' + animPrefix, true);
+                    } else {
+                        sprite.setVelocityX(0);
+                        //sprite.anims.play('idle' + animPrefix, true);
                     }
-                    if (this.keyW.isDown) {
-                        this.shoot_angle = 270;
-                        this.arrow1.setVelocityX(0)
-                        this.arrow1.setVelocityY(270 * Math.sin(this.shoot_angle * 2 * 3.14))
-                        this.arrow1.setRotation(2 * 3.14 - 2 * 3.14);
-                    }
-                }
-                if (this.keySpace.isDown) {
-                    this.player1.setVelocityX(0);
-                    this.draw_aim();
-                    this.space_pressed = true;
-                }
-                else {
-                    this.space_pressed = false;
-                }
 
-                if (!this.keySpace2.isDown && this.space_pressed2) {
-                    this.graphics2.clear();
-                    this.arrow2.setPosition(this.player2.x, this.player2.y)
-                    this.arrow2.setVelocityX(-270 * Math.cos(this.shoot_angle2 * 2 * 3.14))
-                    this.arrow2.setVelocityY(-270 * Math.sin(this.shoot_angle2 * 2 * 3.14))
-                    this.arrow2.setRotation(this.shoot_angle2 * 2 * 3.14 - 3 * 3.14 / 2);
-                    if (this.keyRight.isDown) {
-                        this.arrow2.setVelocityX(270 * Math.cos(this.shoot_angle2 * 2 * 3.14))
-                        this.arrow2.setVelocityY(270 * Math.sin(this.shoot_angle2 * 2 * 3.14))
-                        this.arrow2.setRotation(this.shoot_angle2 * 2 * 3.14 - 3.14 / 2);
+                    if ((cursors.W?.isDown || cursors.UP?.isDown) && sprite.body.blocked.down) {
+                        sprite.setVelocityY(-330);
                     }
-                    if (this.keyUp.isDown) {
-                        this.shoot_angle2 = 270;
-                        this.arrow2.setVelocityX(0)
-                        this.arrow2.setVelocityY(270 * Math.sin(this.shoot_angle2 * 2 * 3.14))
-                        this.arrow2.setRotation(2 * 3.14 - 2 * 3.14);
-                    }
-                }
-                if (this.keySpace2.isDown) {
-                    this.player2.setVelocityX(0);
-                    this.draw_aim2();
-                    this.space_pressed2 = true;
-                } else {
-                    this.space_pressed2 = false;
-                }
 
+                    if (cursors.SPACE?.isDown || cursors.ENTER?.isDown) {
+                        this.shootArrow(player);
+                    }
+                });
             }
 
-            draw_aim() {
-                this.graphics1.clear();
-                this.circle.setTo(this.player1.x, this.player1.y, 20);
-                var point = this.circle.getPoint(this.shoot_angle);
-                Phaser.Geom.Line.SetToAngle(this.line, point.x, point.y, this.shoot_angle * 6.28, 20);
-                this.graphics1.strokeCircleShape(this.circle);
-                this.graphics1.strokeLineShape(this.line);
+            shootArrow(player) {
+                const arrow = player.arrow;
 
-            }
+                arrow.setPosition(player.sprite.x, player.sprite.y);
+                arrow.setVisible(true);
+                arrow.setVelocityX(270 * Math.cos(player.shoot_angle * 2 * Math.PI));
+                arrow.setVelocityY(270 * Math.sin(player.shoot_angle * 2 * Math.PI));
+                arrow.setRotation(player.shoot_angle * 2 * Math.PI - 1.5 * Math.PI);
+                arrow.body.enable = true;
 
-            draw_aim2() {
-                this.graphics2.clear();
-                this.circle2.setTo(this.player2.x, this.player2.y, 20);
-                var point = this.circle2.getPoint(this.shoot_angle2);
-                Phaser.Geom.Line.SetToAngle(this.line2, point.x, point.y, this.shoot_angle2 * 6.28, 20);
-                this.graphics2.strokeCircleShape(this.circle2);
-                this.graphics2.strokeLineShape(this.line2);
+                const opponent = this.players.find(p => p !== player);
+                this.physics.add.overlap(arrow, opponent.sprite, () => {
+                    arrow.body.enable = false;
+                    //arrow.setPosition(0 ,0);
+                    if (opponent.healthBar.decrease(25)) {
+                        this.vitoriaSound.play();
 
+                        // Para todas as músicas e sons ativos antes de mudar de cena
+                        this.sound.stopAll();
+                        this.scene.stop('Guerra_de_Coelhos');
+                        this.scene.start('GameOver', { winner: player === this.players[0] ? 'Jogador 1' : 'Jogador 2' });
+                    }
+                    this.hitSound.play();
+                    arrow.setVisible(false);
+                    arrow.setPosition(-50, -50);
+                });
             }
         }
 
-        function arrow1HitWall(arrow1, wall) {
-            //console.log(arrow1)
-            arrow1.y = 1000;
-        }
 
-        var config = {
-
-            // resolução e sistema de colisão.
-            width: 1920,
-            height: 1080,
-            physics: {
-                default: 'arcade',
-                arcade: {
-                    debug: false,
-                },
-            },
-            //gravity: { y: 300 },
-
-            // tratamento dos gráficos: pixelado
-            render: {
-                antialiasGL: false,
-                pixelArt: true,
-            },
-
-            // funções da classe scene:
-            scene: [fase_1 /*coloque o nome da sua fase aqui*/],
+        const config = {
+            type: Phaser.AUTO,
+            width: 1280,
+            height: 960,
+            backgroundColor: '#000000',
+            physics: { default: 'arcade', arcade: { gravity: { y: 300 }, debug: false } },
+            scene: [Menu, Guerra_de_Coelhos, Movimentos, GameOver]
         };
 
-        var game = new Phaser.Game(config);
-
-
+        const game = new Phaser.Game(config);
     </script>
-
 </body>
 
 </html>
